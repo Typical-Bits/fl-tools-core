@@ -3,6 +3,19 @@ import { CANDIDATE_ROOT_QUERY, CURRENT_ACCOUNT_ATTRIBUTE } from '../fetlife/sele
 
 const FLUSH_KEY = 'core.scanner.flush';
 
+function isOwnedNode(node) {
+  return node?.nodeType === 1 && node.matches?.('.flt-root, .flt-root *');
+}
+
+function isOwnedOnlyMutation(mutation) {
+  if (mutation.type !== 'childList') return false;
+  if (mutation.target?.closest?.('.flt-root')) return true;
+  const changed = [...mutation.addedNodes, ...mutation.removedNodes].filter(
+    (node) => node.nodeType === 1,
+  );
+  return changed.length > 0 && changed.every(isOwnedNode);
+}
+
 function fingerprint(candidate) {
   const element = candidate.element;
   const text = element.textContent?.replace(/\s+/g, ' ').trim().slice(0, 1024) ?? '';
@@ -120,8 +133,10 @@ export class Scanner {
   }
 
   #onMutations = (mutations) => {
-    this.#eventBus.emit('scanner:mutated', { count: mutations.length });
-    for (const mutation of mutations) {
+    const relevant = mutations.filter((mutation) => !isOwnedOnlyMutation(mutation));
+    if (relevant.length === 0) return;
+    this.#eventBus.emit('scanner:mutated', { count: relevant.length });
+    for (const mutation of relevant) {
       this.#collect(mutation.target);
       for (const node of mutation.addedNodes) this.#collect(node);
     }

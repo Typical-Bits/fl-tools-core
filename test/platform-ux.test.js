@@ -262,8 +262,11 @@ test('CoreUI renders one accessible notification and privacy-redacted Diagnostic
   assert.match(downloadName, /^fl-tools-diagnostics-.*\.json$/);
   await press('Clear Activity Log');
   assert.equal(services.diagnostics.recent().length, 0);
-  await press('Reset Session State');
-  assert.equal(container.querySelector('[role="status"]').textContent, 'Session Reset');
+  await press('Reset and refresh');
+  assert.equal(
+    container.querySelector('[role="status"]').textContent,
+    'Settings and session reset',
+  );
   const opening = ui.openDiagnostics();
   await new Promise((resolve) => setTimeout(resolve, 0));
   const dialog = dom.window.document.querySelector('.flt-dialog');

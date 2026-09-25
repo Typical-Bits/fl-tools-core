@@ -305,6 +305,10 @@ html.flt-reduce-motion .flt-root, html.flt-reduce-motion .flt-root * { animation
   padding: 5px 7px; font: inherit; line-height: 1.25;
 }
 .flt-input option { background: var(--flt-surface); color: var(--flt-text); }
+.flt-panel select.flt-input {
+  position: relative; z-index: 1; appearance: auto !important; pointer-events: auto !important;
+  cursor: pointer; opacity: 1;
+}
 .flt-field-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 6px; align-items: start; }
 .flt-field-row > .flt-field { min-width: 0; }
 .flt-panel .flt-field-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }

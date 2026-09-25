@@ -162,7 +162,7 @@ export class CoreUI {
       document: this.#document,
       footer,
       onDiagnostics: this.#diagnostics
-        ? (container) => this.mountDiagnostics(container)
+        ? (container) => this.mountDiagnostics(container, { onSystemReset: options.onSystemReset })
         : undefined,
       version,
     });
@@ -218,7 +218,7 @@ export class CoreUI {
     return this.#notificationCenter?.dismiss(id) ?? false;
   }
 
-  async mountDiagnostics(container, { detailed = false } = {}) {
+  async mountDiagnostics(container, { detailed = false, onSystemReset } = {}) {
     if (!container?.replaceChildren || !this.#diagnostics)
       throw new ContractError('Diagnostics is unavailable');
     const doc = this.#document;
@@ -253,8 +253,8 @@ export class CoreUI {
         onClick: async () => {
           button.disabled = true;
           try {
-            await run();
-            status.textContent = success;
+            const result = await run();
+            if (result !== false) status.textContent = success;
           } catch {
             status.textContent = label + ' failed. Please try again.';
           } finally {
@@ -284,10 +284,12 @@ export class CoreUI {
       this.#diagnostics.clearActivity();
       await snapshot();
     });
-    action('Refresh State', 'State Refreshed', snapshot);
-    action('Reset Session State', 'Session Reset', async () => {
+    action('Reset and refresh', 'Settings and session reset', async () => {
+      const reset = await onSystemReset?.();
+      if (reset === false) return false;
       this.#diagnostics.resetSession();
       await snapshot();
+      return true;
     });
     action('Export JSON', 'Diagnostics Exported', async () => {
       const report = await snapshot();
@@ -311,7 +313,7 @@ export class CoreUI {
       try {
         await snapshot();
       } catch {
-        status.textContent = 'Diagnostics could not be loaded. Use Refresh State to retry.';
+        status.textContent = 'Diagnostics could not be loaded. Use Show Diagnostics to retry.';
       }
     }
     return {

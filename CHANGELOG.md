@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 0.0.8
+
+- Ignore FL Tools-owned DOM updates during page scanning to prevent recursive work and slow pages.
+- Replace separate refresh and session-reset actions with one Reset and refresh control.
+- Keep Appearance select menus usable inside every product shell.
+
 ## 0.0.7
 
 - Consolidate troubleshooting under a final System menu and rename Theme & Layout to Appearance.

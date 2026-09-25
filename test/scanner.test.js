@@ -106,6 +106,44 @@ test('Scanner subscriptions and queued route work tear down safely', async () =>
   scanner.stop();
 });
 
+test('Scanner ignores FL Tools-only child mutations inside native candidates', async () => {
+  const dom = await loadFixture('feed', 'https://fetlife.com/activity');
+  const fetlife = new FetLifeService();
+  const scheduler = new Scheduler({ autoStart: false });
+  const scanner = new Scanner({
+    eventBus: new EventBus(),
+    fetlife,
+    observerFactory: (callback) => new dom.window.MutationObserver(callback),
+    scheduler,
+  });
+  let calls = 0;
+  scanner.subscribe(['content'], () => ++calls);
+  scanner.start({
+    root: dom.window.document,
+    routeContext: {
+      route: fetlife.detectRoute(dom.window.location.href),
+      signal: new AbortController().signal,
+    },
+  });
+  await scheduler.flush();
+  assert.equal(calls, 1);
+
+  const candidate = dom.window.document.querySelector('[data-story-uid="StoryID:9001"]');
+  const owned = dom.window.document.createElement('span');
+  owned.className = 'flt-root';
+  owned.textContent = 'Tool status';
+  candidate.append(owned);
+  await delay(0);
+  await scheduler.flush();
+  assert.equal(calls, 1);
+
+  owned.remove();
+  await delay(0);
+  await scheduler.flush();
+  assert.equal(calls, 1);
+  scanner.stop();
+});
+
 test('a new route initial scan is not lost behind cancelled old-route work', async () => {
   const dom = await loadFixture('feed', 'https://fetlife.com/activity');
   const fetlife = new FetLifeService();
