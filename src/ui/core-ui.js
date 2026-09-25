@@ -112,12 +112,53 @@ export class CoreUI {
     };
     const version = options.version ?? this.#version;
     const preferences = this.preferences.mount();
+    const supplied = options.navigation.map((entry) => ({ ...entry }));
+    const appearance = supplied.find((entry) => entry.id === 'appearance');
+    const diagnostics = supplied.find((entry) => entry.id === 'diagnostics');
+    const system = supplied.find((entry) => entry.id === 'system');
+    const combine = (id, contents, shared = []) => {
+      const root = this.#document.createElement('div');
+      root.className = 'flt-control-stack';
+      const productContent = this.#document.createElement('div');
+      productContent.className = 'flt-control-stack';
+      productContent.dataset.fltProductViewContent = id;
+      for (const content of contents) if (content) productContent.append(content);
+      root.append(productContent);
+      for (const content of shared) if (content) root.append(content);
+      return root;
+    };
+    const navigation = supplied.filter(
+      (entry) => !['appearance', 'diagnostics', 'system'].includes(entry.id),
+    );
+    navigation.push({
+      ...appearance,
+      content: combine('appearance', [appearance?.content], [preferences.element]),
+      description:
+        appearance?.description ??
+        'Adjust how FL Tools menus look and behave on this browser and site.',
+      id: 'appearance',
+      label: 'Appearance',
+    });
+    navigation.push({
+      ...system,
+      aliases: [
+        ...new Set([
+          ...(system?.aliases ?? []),
+          ...(diagnostics?.aliases ?? []),
+          'diagnostics',
+          'settings',
+        ]),
+      ],
+      content: combine('system', [system?.content, diagnostics?.content]),
+      description:
+        system?.description ??
+        'Review page and plugin health, export diagnostics, and use product maintenance actions.',
+      id: 'system',
+      label: 'System',
+    });
     const shell = new ProductShell({
       ...options,
-      navigation: [
-        ...options.navigation,
-        { id: 'appearance', label: 'Theme & Layout', content: preferences.element },
-      ],
+      navigation,
       document: this.#document,
       footer,
       onDiagnostics: this.#diagnostics

@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+## 0.0.7
+
+- Consolidate troubleshooting under a final System menu and rename Theme & Layout to Appearance.
+- Collapse product keyboard shortcuts while keeping native FetLife shortcuts and reference tools available.
+- Keep launchers attached to the right edge with vertical movement only.
+- Rename the shared Gradient appearance to Pride and improve explanatory helper tips.
+
 ## 0.0.6
 
 - Keep every product menu fully inside the viewport after launcher dragging and window resizing.

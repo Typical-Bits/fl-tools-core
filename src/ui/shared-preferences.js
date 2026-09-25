@@ -12,7 +12,7 @@ function normalize(value = {}) {
     reduceMotion: value?.reduceMotion === true,
     notifications: value?.notifications !== false,
     menuWidth: ['full', 'compact', 'narrow'].includes(value?.menuWidth) ? value.menuWidth : 'full',
-    themeSkin: value?.themeSkin === 'gradient' ? 'gradient' : 'default',
+    themeSkin: ['gradient', 'pride'].includes(value?.themeSkin) ? 'pride' : 'default',
   };
 }
 export class SharedPreferences {
@@ -110,7 +110,7 @@ export class SharedPreferences {
         'Menu theme',
         [
           ['default', 'Default'],
-          ['gradient', 'Gradient'],
+          ['pride', 'Pride'],
         ],
       ],
       [

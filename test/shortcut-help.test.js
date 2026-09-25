@@ -29,6 +29,9 @@ test('shortcut help opens beside Close, refreshes in place, and dismisses before
   assert.match(card.querySelector('h3').dataset.fltTip, /FL Tools keys work outside text fields/);
   assert.match(card.textContent, /FetLife native shortcuts/);
   assert.match(card.textContent, /Go to inbox/);
+  const productShortcuts = card.querySelector('.flt-shortcut-disclosure');
+  assert.equal(productShortcuts.tagName, 'DETAILS');
+  assert.equal(productShortcuts.open, false);
   const refreshed = document.createElement('dl');
   refreshed.textContent = 'Previous card J';
   shell.setShortcutFooter(refreshed);

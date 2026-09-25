@@ -260,10 +260,16 @@ export class ProductShell {
         'FL Tools keys work outside text fields and interactive controls. Alt+Shift is used only for conflicts. FetLife shortcuts stay unchanged.';
       heading.setAttribute('aria-description', heading.dataset.fltTip);
       heading.tabIndex = 0;
+      const productShortcuts = document.createElement('details');
+      productShortcuts.className = 'flt-shortcut-disclosure';
+      const productSummary = document.createElement('summary');
+      productSummary.textContent = 'FL Tools shortcuts';
       this.#shortcutFooter = document.createElement('div');
+      productShortcuts.append(productSummary, this.#shortcutFooter);
       const nativeHelp = nativeShortcutHelp(document);
       nativeHelp.addEventListener('toggle', () => this.#scheduleLayout());
-      this.#shortcutHelp.append(heading, this.#shortcutFooter, nativeHelp);
+      productShortcuts.addEventListener('toggle', () => this.#scheduleLayout());
+      this.#shortcutHelp.append(heading, productShortcuts, nativeHelp);
       this.#shortcutHelp.append(terminologyHelp(document, () => this.#scheduleLayout()));
       this.#element.querySelector('.flt-panel-body').prepend(this.#shortcutHelp);
     }
@@ -296,6 +302,15 @@ export class ProductShell {
     const resolvedId = this.#resolveViewId(id);
     const view = this.#views.get(resolvedId);
     if (!view) throw new ContractError('Unknown shell destination', { id });
+    const productContent = [...view.querySelectorAll('[data-flt-product-view-content]')].find(
+      (candidate) => candidate.dataset.fltProductViewContent === resolvedId,
+    );
+    if (productContent) {
+      productContent.replaceChildren();
+      if (content) productContent.append(content);
+      this.#scheduleLayout();
+      return;
+    }
     view.replaceChildren();
     if (content) view.append(content);
     if (this.#support.has(resolvedId)) view.append(this.#support.get(resolvedId));
@@ -394,7 +409,7 @@ export class ProductShell {
       else this.#element.dataset.fltMenuWidth = width;
     }
     if (themeSkin !== undefined) {
-      if (themeSkin === 'gradient') this.#element.dataset.fltThemeSkin = 'gradient';
+      if (themeSkin === 'pride') this.#element.dataset.fltThemeSkin = 'pride';
       else delete this.#element.dataset.fltThemeSkin;
     }
     this.#syncClusterChrome();

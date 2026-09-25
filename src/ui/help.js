@@ -29,7 +29,7 @@ export const CONTROL_HELP = Object.freeze({
   'Appearance and accessibility':
     'Control spacing, contrast, menu width, system notices, and default launcher placement.',
   'Fixed shortcuts':
-    'Open the ? button beside Close for shortcuts. Basic and Pro share single keys, with Alt+Shift+B reserved for the native bookmark conflict.',
+    'Open the book button beside Close to review FL Tools and native FetLife shortcuts.',
   Reset: 'Restore Browse defaults. Other product data is not removed by this action.',
   'Group name contains': 'Filter only the loaded native Groups whose names contain this text.',
   'Event name contains': 'Filter only the loaded native Events whose names contain this text.',
@@ -56,8 +56,7 @@ export const CONTROL_HELP = Object.freeze({
     'Private Session, Themes swatches, menu width, launcher placement, and keyboard shortcuts.',
   Themes:
     'Choose a site and menu color theme. Site Default leaves the native site theme unchanged.',
-  System:
-    'Appearance preferences and a Diagnostics submenu for export and resetting Browse settings.',
+  System: 'Review page and plugin health, export diagnostics, and use product maintenance actions.',
   Settings: 'Product maintenance and page/plugin diagnostics export.',
   Groups: 'Filter loaded native Groups by name, membership, and source-reported activity.',
   Events: 'Filter loaded native Events by name, source location, dates, and attendance mode.',
@@ -111,8 +110,7 @@ export const CONTROL_HELP = Object.freeze({
   'Menu width':
     'Choose Full, Compact, or Narrow plugin menu width. Other FL Tools menus on this page follow the same width.',
   'Update and system notifications': 'Show product update and system notices.',
-  'Launcher side':
-    'Choose the default docking side. You can also drag any launcher to move the whole grid.',
+  'Launcher side': 'Launchers stay docked to the right edge and can move vertically.',
   'Reduce motion': 'Reduce interface animations and transitions.',
   'Compact dock': 'Use a narrower launcher arrangement.',
   'Hide Pro dock launcher':

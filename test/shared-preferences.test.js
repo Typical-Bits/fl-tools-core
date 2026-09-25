@@ -18,6 +18,10 @@ test('shared appearance controls sync shells, persist, and survive legacy adopti
     }),
   );
   const appearance = shells[0].element.querySelector('[data-flt-view="appearance"]');
+  assert.deepEqual(
+    [...shells[0].element.querySelectorAll('.flt-tool-title')].map((node) => node.textContent),
+    ['Main', 'Appearance', 'System'],
+  );
   assert.doesNotMatch(appearance.textContent, /Shared across FL Tools/);
   assert.match(
     [...appearance.querySelectorAll('.flt-label')].find(
@@ -35,10 +39,10 @@ test('shared appearance controls sync shells, persist, and survive legacy adopti
     'true',
   );
   const theme = appearance.querySelector('select');
-  theme.value = 'gradient';
+  theme.value = 'pride';
   theme.dispatchEvent(new dom.window.Event('change'));
   for (const shell of shells) {
-    assert.equal(shell.element.dataset.fltThemeSkin, 'gradient');
+    assert.equal(shell.element.dataset.fltThemeSkin, 'pride');
     assert.equal(shell.element.dataset.fltMenuWidth, 'compact');
   }
   ui.preferences.adopt({ notifications: true, menuWidth: 'full' });

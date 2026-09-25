@@ -27,10 +27,7 @@ export function clampLauncherOrigin(view, origin, size) {
   const viewWidth = view?.innerWidth || 0;
   const viewHeight = view?.innerHeight || 0;
   return {
-    x: Math.max(
-      VIEWPORT_EDGE,
-      Math.min(origin.x, Math.max(VIEWPORT_EDGE, viewWidth - width - VIEWPORT_EDGE)),
-    ),
+    x: Math.max(VIEWPORT_EDGE, viewWidth - width - VIEWPORT_EDGE),
     y: Math.max(
       VIEWPORT_EDGE,
       Math.min(origin.y, Math.max(VIEWPORT_EDGE, viewHeight - height - VIEWPORT_EDGE)),
@@ -38,8 +35,8 @@ export function clampLauncherOrigin(view, origin, size) {
   };
 }
 
-export function dockIsLeft(document) {
-  return document?.documentElement?.classList?.contains('flt-basic-launcher-left') === true;
+export function dockIsLeft(_document) {
+  return false;
 }
 
 function isSafeIconUrl(value, baseUrl) {
@@ -232,13 +229,13 @@ export class LauncherManager {
         /* Optional persistence. */
       }
     };
-    const place = (x, y) => {
+    const place = (_x, y) => {
       const size = launcherSize(handle);
-      this.#position = clampLauncherOrigin(view, { x, y }, size);
+      this.#position = clampLauncherOrigin(view, { x: _x, y }, size);
       Object.assign(cluster.style, {
-        left: `${this.#position.x}px`,
+        left: 'auto',
         top: `${this.#position.y}px`,
-        right: 'auto',
+        right: `${VIEWPORT_EDGE}px`,
         bottom: 'auto',
       });
       persist();
@@ -274,15 +271,14 @@ export class LauncherManager {
       'pointermove',
       (event) => {
         if (!drag || event.pointerId !== drag.id) return;
-        const dx = event.clientX - drag.x;
         const dy = event.clientY - drag.y;
-        if (!drag.moved && Math.hypot(dx, dy) < 5) return;
+        if (!drag.moved && Math.abs(dy) < 5) return;
         drag.moved = true;
         this.#suppressClick = true;
         handle.dataset.dragging = 'true';
         handle.setPointerCapture?.(event.pointerId);
         event.preventDefault();
-        place(drag.left + dx, drag.top + dy);
+        place(drag.left, drag.top + dy);
       },
       options,
     );
@@ -306,15 +302,11 @@ export class LauncherManager {
     handle.addEventListener(
       'keydown',
       (event) => {
-        if (
-          !event.altKey ||
-          !['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(event.key)
-        )
-          return;
+        if (!event.altKey || !['ArrowUp', 'ArrowDown'].includes(event.key)) return;
         event.preventDefault();
         const rect = handle.getBoundingClientRect();
         place(
-          rect.left + (event.key === 'ArrowRight' ? 16 : event.key === 'ArrowLeft' ? -16 : 0),
+          rect.left,
           rect.top + (event.key === 'ArrowDown' ? 16 : event.key === 'ArrowUp' ? -16 : 0),
         );
       },

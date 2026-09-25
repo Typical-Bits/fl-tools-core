@@ -38,10 +38,11 @@ test('launcher drag persists, clamps to viewport, and does not activate a produc
   pointer(dom.window, 'pointerup', 130, 150);
   button.dispatchEvent(new dom.window.MouseEvent('click', { detail: 1 }));
   assert.equal(activated, 0);
-  assert.equal(cluster.style.left, '120px');
+  assert.equal(cluster.style.left, 'auto');
+  assert.equal(cluster.style.right, '8px');
   assert.equal(cluster.style.top, '140px');
   assert.deepEqual(JSON.parse(dom.window.localStorage.getItem('flt-launcher-position')), {
-    x: 120,
+    x: dom.window.innerWidth - 112,
     y: 140,
   });
   pointer(button, 'pointerdown', 130, 150);
@@ -56,7 +57,8 @@ test('launcher drag persists, clamps to viewport, and does not activate a produc
     iconUrl: 'data:image/png;base64,AA==',
     onActivate() {},
   });
-  assert.equal(document.querySelector('.flt-cluster').style.left, '120px');
+  assert.equal(document.querySelector('.flt-cluster').style.left, 'auto');
+  assert.equal(document.querySelector('.flt-cluster').style.right, '8px');
   next.resetPosition();
   assert.equal(document.querySelector('.flt-cluster').style.left, '');
   const nextCluster = document.querySelector('.flt-cluster');
@@ -65,7 +67,8 @@ test('launcher drag persists, clamps to viewport, and does not activate a produc
   pointer(nextGrid, 'pointerdown', 20, 20);
   pointer(dom.window, 'pointermove', 5000, 5000);
   pointer(dom.window, 'pointerup', 5000, 5000);
-  assert.equal(nextCluster.style.left, `${dom.window.innerWidth - 112}px`);
+  assert.equal(nextCluster.style.left, 'auto');
+  assert.equal(nextCluster.style.right, '8px');
   assert.equal(nextCluster.style.top, `${dom.window.innerHeight - 112}px`);
   next.destroy();
   dom.window.close();
@@ -98,7 +101,7 @@ async function flushLayout(view) {
   await tick();
 }
 
-test('open menus stay inside the window without rewriting launcher origin', async () => {
+test('open menus stay inside the window while normalizing launcher origin to the right edge', async () => {
   const { document, dom } = environment();
   Object.defineProperty(dom.window, 'innerWidth', { configurable: true, value: 900 });
   Object.defineProperty(dom.window, 'innerHeight', { configurable: true, value: 500 });
@@ -131,13 +134,16 @@ test('open menus stay inside the window without rewriting launcher origin', asyn
   assert.ok(Number.isFinite(maxHeight) && maxHeight <= 500 - 40);
   assert.equal(cluster.style.left, 'auto');
   assert.equal(cluster.style.right, `${900 - (origin.x + 104)}px`);
-  assert.deepEqual(JSON.parse(dom.window.localStorage.getItem('flt-launcher-position')), origin);
+  assert.deepEqual(JSON.parse(dom.window.localStorage.getItem('flt-launcher-position')), {
+    x: 844,
+    y: origin.y,
+  });
   shell.destroy();
   launcher.destroy();
   dom.window.close();
 });
 
-test('open menus shift inside the opposite viewport edge after launcher drag', async () => {
+test('open menus remain attached to the right edge after launcher drag', async () => {
   const { document, dom } = environment();
   Object.defineProperty(dom.window, 'innerWidth', { configurable: true, value: 900 });
   Object.defineProperty(dom.window, 'innerHeight', { configurable: true, value: 500 });
@@ -166,14 +172,17 @@ test('open menus shift inside the opposite viewport edge after launcher drag', a
   const right = Number.parseFloat(cluster.style.right);
   const menuLeft = dom.window.innerWidth - right - shell.element.offsetWidth;
   assert.ok(menuLeft >= 8, `menu left ${menuLeft}px must stay in view`);
-  assert.equal(right, 580);
-  assert.deepEqual(JSON.parse(dom.window.localStorage.getItem('flt-launcher-position')), origin);
+  assert.equal(right, 8);
+  assert.deepEqual(JSON.parse(dom.window.localStorage.getItem('flt-launcher-position')), {
+    x: 844,
+    y: origin.y,
+  });
   shell.destroy();
   launcher.destroy();
   dom.window.close();
 });
 
-test('left-docked menus shift inside the right viewport edge after launcher drag', async () => {
+test('legacy left-dock state cannot move launchers away from the right edge', async () => {
   const { document, dom } = environment();
   Object.defineProperty(dom.window, 'innerWidth', { configurable: true, value: 900 });
   Object.defineProperty(dom.window, 'innerHeight', { configurable: true, value: 500 });
@@ -200,11 +209,12 @@ test('left-docked menus shift inside the right viewport edge after launcher drag
   stubBox(shell.element, { height: 360, left: origin.x, top: origin.y, width: 312 });
   shell.open();
   await flushLayout(dom.window);
-  const left = Number.parseFloat(cluster.style.left);
-  const menuRight = left + shell.element.offsetWidth;
-  assert.ok(menuRight <= 892, `menu right ${menuRight}px must stay in view`);
-  assert.equal(left, 580);
-  assert.deepEqual(JSON.parse(dom.window.localStorage.getItem('flt-launcher-position')), origin);
+  assert.equal(cluster.style.left, 'auto');
+  assert.equal(cluster.style.right, '8px');
+  assert.deepEqual(JSON.parse(dom.window.localStorage.getItem('flt-launcher-position')), {
+    x: 844,
+    y: origin.y,
+  });
   shell.destroy();
   launcher.destroy();
   dom.window.close();
@@ -531,10 +541,10 @@ test('ProductShell uses accordion behavior, Escape, and focus return', () => {
   headers.at(-1).click();
   assert.equal(headers.at(-1).getAttribute('aria-expanded'), 'false');
   assert.equal(headers.at(-1).classList.contains('last-opened'), true);
-  shell.setChrome({ contrast: true, menuWidth: 'narrow', themeSkin: 'gradient' });
+  shell.setChrome({ contrast: true, menuWidth: 'narrow', themeSkin: 'pride' });
   assert.equal(shell.element.dataset.fltContrast, 'true');
   assert.equal(shell.element.dataset.fltMenuWidth, 'narrow');
-  assert.equal(shell.element.dataset.fltThemeSkin, 'gradient');
+  assert.equal(shell.element.dataset.fltThemeSkin, 'pride');
   assert.equal(document.documentElement.classList.contains('flt-menu-width-narrow'), true);
   shell.setChrome({ contrast: false, menuWidth: 'full', themeSkin: '' });
   assert.equal(shell.element.dataset.fltContrast, 'false');

@@ -13,10 +13,10 @@
 ## Release
 
 <p>
-  <a href="https://github.com/Typical-Bits/fl-tools-core/releases/tag/v0.0.6">
+  <a href="https://github.com/Typical-Bits/fl-tools-core/releases/tag/v0.0.7">
     <img alt="View FL Tools Core release" src="https://img.shields.io/badge/Release-FL%20Tools%20Core-b91c1c?style=flat-square">
   </a>
-  <img alt="Version 0.0.6" src="https://img.shields.io/badge/version-0.0.6-22C55E?style=flat-square">
+  <img alt="Version 0.0.7" src="https://img.shields.io/badge/version-0.0.7-22C55E?style=flat-square">
 </p>
 
 Core has no separate launcher or user installation.
